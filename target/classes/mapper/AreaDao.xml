@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.o2o.dao.AreaDao"> <!-- sql映射文件名  AreaDao.xml,去掉xml-->
+  <select id="queryAreas" resultType="com.yang.o2o.entity.Area">
+	SELECT area_id, area_name, area_weight, area_create_time, area_alter_time
+	FROM tb_area
+	ORDER BY area_weight DESC		
+  </select>
+</mapper>

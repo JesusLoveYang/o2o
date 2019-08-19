@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.o2o.dao.ProductCategoryDao">
+	<delete id="deleteProductCategory">
+		DELETE FROM
+		tb_product_category
+		WHERE
+		product_category_id = #{productCategoryId} AND
+		shop_id = #{shopId}
+	</delete>
+
+	<insert id="addProductCategorys" parameterType="java.util.List">
+		INSERT INTO
+		tb_product_category(product_category_name, weight, create_time, shop_id)
+		VALUES		
+		<foreach collection="list" item="productCategory" index="index" separator=",">
+			(
+				#{productCategory.productCategoryName}, 
+				#{productCategory.weight}, 
+				#{productCategory.createTime}, 
+				#{productCategory.shopId}
+			)
+		</foreach>
+	</insert>
+
+	<select id="queryProductCategory" resultType="com.yang.o2o.entity.ProductCategory" parameterType="Long">
+		SELECT 
+		pc.product_category_id,
+		pc.product_category_name,
+		pc.weight,
+		pc.create_time,
+		s.shop_id
+		FROM
+		tb_product_category AS pc,
+		tb_shop AS s
+		WHERE
+		pc.shop_id = s.shop_id AND
+		pc.shop_id = #{shopId}
+		ORDER BY weight DESC;
+	</select>
+</mapper>
+ 

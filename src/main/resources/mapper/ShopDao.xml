@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.o2o.dao.ShopDao">
+	<resultMap type="com.yang.o2o.entity.Shop" id="shopMap">
+		<id column="shop_id" property="shopId"/>
+		<result column="shop_name" property="shopName"/>
+		<result column="shop_des" property="shopDes"/>
+		<result column="shop_addr" property="shopAddr"/>
+		<result column="shop_img" property="shopImg"/>
+		<result column="phone" property="phone"/>
+		<result column="shop_weight" property="shopWeight"/>
+		<result column="shop_status" property="status"/>
+		<result column="shop_create_time" property="shopCreateTime"/>
+		<result column="shop_alter_time" property="shopAlterTime"/>
+		<result column="adivce" property="adivce"/>
+		<!-- 复合类型,  通过id来连接 ， 还要定义JavaType-->
+		<association property="area" column="area_id" javaType="com.yang.o2o.entity.Area">
+			<id column="area_id" property="areaId"/>
+			<result column="area_name" property="areaName"/>
+		</association>
+		<association property="shopCategory" column="shop_category_id" javaType="com.yang.o2o.entity.ShopCategory">
+			<id column="shop_category_id" property="shopCategoryId" />
+			<result column="shop_category_name" property="shopCategoryName"/>
+		</association>
+		<association property="owner" column="owner_id" javaType="com.yang.o2o.entity.PersonInfo">
+			<id column="user_id" property="userId"/>
+			<result column="user_name" property="userName"/>
+		</association>
+	</resultMap>
+	
+	<select id="queryShopList" resultMap="shopMap">
+		SELECT 
+		s.shop_id,
+		s.shop_name,
+		s.shop_des,
+		s.shop_addr,
+		s.shop_img,
+		s.phone,
+		s.shop_weight,
+		s.shop_status,
+		s.shop_create_time,
+		s.shop_alter_time,
+		s.adivce,
+		a.area_id, 
+		a.area_name,
+		sc.shop_category_id,
+		sc.shop_category_name
+		FROM
+		tb_shop AS s, 
+		tb_area AS a, 
+		tb_shop_category AS sc
+		<where>
+			<if test="shopCondition.shopCategory != null and shopCondition.shopCategory.shopCategoryId != null">
+				and s.shop_category_id = #{shopCondition.shopCategory.shopCategoryId}
+			</if>
+			<!-- 添加一个根据parent_id去筛选 -->
+			<if test="shopCondition.shopCategory != null and shopCondition.shopCategory.parent != null
+			          and shopCondition.shopCategory.parent.shopCategoryId != null">
+			          and s.shop_category_id in (select shop_category_id from tb_shop_category 
+			          where parent_id= #{shopCondition.shopCategory.parent.shopCategoryId})
+			</if>
+			<if test="shopCondition.area != null and shopCondition.area.areaId != null">
+				and s.area_id = #{shopCondition.area.areaId}
+			</if>
+			<if test="shopCondition.owner != null and shopCondition.owner.userId != null">
+				and s.owner_id = #{shopCondition.owner.userId}
+			</if>
+			<if test="shopCondition.shopName != null">
+				and s.shop_name LIKE '%${shopCondition.shopName}%'  <!-- 模糊查询 -->
+			</if>
+			<if test="shopCondition.status != null">
+				and s.shop_status = #{shopCondition.status}
+			</if>
+			AND
+			s.area_id = a.area_id AND
+			s.shop_category_id = sc.shop_category_id
+		</where>
+		ORDER BY s.shop_weight DESC
+		<!-- 加入分页功能 -->
+		LIMIT #{initIndex}, #{pageSize}
+	</select>
+	
+	<!-- 获取总数 -->
+	<select id="queryShopCount" resultType="int">
+		SELECT 
+		COUNT(1) <!-- 对特定列 有值的行 进行计数 -->
+		FROM
+		tb_shop AS s, 
+		tb_area AS a, 
+		tb_shop_category AS sc
+		<where>
+			<if test="shopCondition.shopCategory != null and shopCondition.shopCategory.shopCategoryId != null">
+				and s.shop_category_id = #{shopCondition.shopCategory.shopCategoryId}
+			</if>
+			<!-- 添加一个根据parent_id去筛选 -->
+			<if test="shopCondition.shopCategory != null and shopCondition.shopCategory.parent != null
+			          and shopCondition.shopCategory.parent.shopCategoryId != null">
+			          and s.shop_category_id in (select shop_category_id from tb_shop_category 
+			          where parent_id= #{shopCondition.shopCategory.parent.shopCategoryId})
+			</if>
+			<if test="shopCondition.area != null and shopCondition.area.areaId != null">
+				and s.area_id = #{shopCondition.area.areaId}
+			</if>
+			<if test="shopCondition.owner != null and shopCondition.owner.userId != null">
+				and s.owner_id = #{shopCondition.owner.userId}
+			</if>
+			<if test="shopCondition.shopName != null">
+				and s.shop_name LIKE '%${shopCondition.shopName}%'  <!-- 模糊查询 -->
+			</if>
+			<if test="shopCondition.status != null">
+				and s.shop_status = #{shopCondition.status}
+			</if>
+			AND
+			s.area_id = a.area_id AND
+			s.shop_category_id = sc.shop_category_id
+		</where>
+	</select>
+	
+	<select id="queryById" resultMap="shopMap" parameterType="Long">
+		SELECT 
+		s.shop_id,
+		s.shop_name,
+		s.shop_des,
+		s.shop_addr,
+		s.shop_img,
+		s.phone,
+		s.shop_weight,
+		s.shop_status,
+		s.shop_create_time,
+		s.shop_alter_time,
+		s.adivce,
+		a.area_id, 
+		a.area_name,
+		sc.shop_category_id,
+		sc.shop_category_name
+		FROM
+		tb_shop AS s, 
+		tb_area AS a, 
+		tb_shop_category AS sc
+		WHERE
+		s.area_id = a.area_id AND
+		s.shop_category_id = sc.shop_category_id AND
+		s.shop_id = #{shopId}
+	</select>
+
+	<insert id="insertShop" useGeneratedKeys="true" keyColumn="shop_id" keyProperty="shopId">
+		INSERT INTO
+		tb_shop(shop_name, shop_des, shop_addr, shop_img, phone, shop_weight, shop_status, shop_create_time,
+		        shop_alter_time, adivce, area_id, shop_category_id, owner_id)
+		VALUES(#{shopName}, #{shopDes}, #{shopAddr}, #{shopImg}, #{phone}, #{shopWeight}, #{status},
+		       #{shopCreateTime}, #{shopAlterTime}, #{adivce}, #{area.areaId}, #{shopCategory.shopCategoryId}, #{owner.userId})
+	</insert>
+    
+    <update id="updateShop" parameterType="com.yang.o2o.entity.Shop">
+    	UPDATE tb_shop
+    	<set>  <!-- set是动态生成sql的方法 -->
+    		<if test="shopName != null">shop_name = #{shopName},</if>
+    		<if test="shopDes != null">shop_des = #{shopDes},</if>
+    		<if test="shopAddr != null">shop_addr = #{shopAddr},</if>
+    		<if test="shopImg != null">shop_img = #{shopImg},</if>
+    		<if test="phone != null">phone = #{phone},</if>
+    		<if test="shopWeight != null">shop_weight = #{shopWeight},</if>
+    		<if test="status != null">shop_status = #{status},</if>
+    		<if test="shopAlterTime != null">shop_alter_time = #{shopAlterTime},</if>
+    		<if test="adivce != null">adivce = #{adivce},</if>
+    		<if test="area != null">area_id = #{area.areaId},</if>   <!-- 引用数据类型 写法 -->
+    		<if test="shopCategory != null">shop_category_id = #{shopCategory.shopCategoryId}</if>
+    	</set>
+    	WHERE shop_id = #{shopId} <!-- 这个where意思是：当传入shopId时才做相应的操作 -->
+    </update>
+</mapper>

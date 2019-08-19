@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 定义参数常量 ，也就是properties  一些全局变量，用于后面使用-->
+    <!-- 日志的级别分成五种：trace、debug、info、warn、error， 级别依次增大 -->
+    <!-- 当通过log.xx("msg")形式定义一个级别时，比如log.debug(".."),比它小的级别将不显示，级别比它大的都将会显示 -->
+    <!-- 通常使用的是 debug、info、error -->
+    <property name="log.level" value="debug" />
+    <property name="log.maxHistory" value="30" />     <!-- 日志存储的最大时间是 30天 -->
+    <property name="log.filePath" value="${catalina.base}/logs/webapps" />
+    <property name="log.pattern"
+	    value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} -%msg%n" />  <!-- 5位level，thread:小写。后面是日志相关的信息了，哪个类的里面信息  -->
+    <!-- 控制台设置 -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+	    <encoder>                                <!-- 它即负责转成字符串，也负责将日志输出到相应的文件中 -->
+	        <pattern>${log.pattern}</pattern>    <!-- 按照这个格式输出 -->
+	    </encoder>
+    </appender>
+    <!-- DEBUG -->
+    <appender name="debugAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.filePath}/debug.log</file>                                       <!-- 文件的路径 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   <!-- 滚动的策略,按天 月或年 -->
+	        <fileNamePattern>${log.filePath}/debug/debug.%d{yyyy-MM-dd}.log.gz          <!-- 文件名称的类型 -->
+	        </fileNamePattern>
+      	    <maxHistory>${log.maxHistory}</maxHistory>                                 <!-- 文件最大保存时间-->
+        </rollingPolicy>
+        <encoder>
+           <pattern>${log.pattern}</pattern> 
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">      <!-- 过滤器，只接收debug级别的日志 -->
+    		<level>DEBUG</level>
+    		<onMatch>ACCEPT</onMatch>
+    		<onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- INFO -->
+    <appender name="infoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.filePath}/info.log</file>                                       <!-- 文件的路径 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   <!-- 滚动的策略,按天 月或年 -->
+	        <fileNamePattern>${log.filePath}/info/info.%d{yyyy-MM-dd}.log.gz          <!-- 文件名称的类型 -->
+	        </fileNamePattern>
+      	    <maxHistory>${log.maxHistory}</maxHistory>                                 <!-- 文件最大保存时间-->
+        </rollingPolicy>
+        <encoder>
+           <pattern>${log.pattern}</pattern> 
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">      <!-- 过滤器，只接收debug级别的日志 -->
+    		<level>INFO</level>
+    		<onMatch>ACCEPT</onMatch>
+    		<onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <!-- ERROR -->
+    <appender name="errorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.filePath}/error.log</file>                                       <!-- 文件的路径 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">   <!-- 滚动的策略,按天 月或年 -->
+	        <fileNamePattern>${log.filePath}/error/error.%d{yyyy-MM-dd}.log.gz          <!-- 文件名称的类型 -->
+	        </fileNamePattern>
+      	    <maxHistory>${log.maxHistory}</maxHistory>                                 <!-- 文件最大保存时间-->
+        </rollingPolicy>
+        <encoder>
+           <pattern>${log.pattern}</pattern> 
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">      <!-- 过滤器，只接收debug级别的日志 -->
+    		<level>ERROR</level>
+    		<onMatch>ACCEPT</onMatch>
+    		<onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+    <logger name="com.yang.o2o" level="${log.level}" additivite="true">  <!-- logger 要和 appender进行绑定  所有下面的表签用到 -ref  -->
+    	<appender-ref ref="debugAppender" />                           <!-- logger对象会往这三个文件输出信息 -->
+    	<appender-ref ref="infoAppender" />
+    	<appender-ref ref="errorAppender" />
+    </logger>
+    <root level="info">  <!-- 只要与info相关的信息都会打印到控制台下面 -->
+    	<appender-ref ref="consoleAppender"/>
+    </root>
+</configuration>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

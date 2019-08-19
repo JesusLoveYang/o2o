@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.o2o.dao.LocalAuthDao">
+	<!-- 先定义一个resultMap，因为本地账号 与 个人信息有外连接 -->
+	<resultMap type="com.yang.o2o.entity.LocalAuth" id="localAuthResultMap">
+		<id column="local_auth_id" property="localAuthId"/>
+		<result column="username" property="userName"/>
+		<result column="pass_word" property="passWord"/>
+		<result column="create_time" property="createTime"/>
+		<result column="alter_time" property="alterTime"/>
+		<association property="personinfo" column="user_id"  
+			javaType="com.yang.o2o.entity.PersonInfo">
+			<id column="user_id" property="userId" />
+			<result column="user_name" property="userName"/>
+			<result column="user_sex" property="userSex"/>
+			<result column="user_img" property="userImg"/>
+			<result column="user_email" property="userEmail"/>
+			<result column="user_status" property="status"/>
+			<result column="user_mark" property="userMark"/>
+			<result column="user_create_time" property="userCreateTime"/>
+			<result column="user_alter_time" property="userAlterTime"/>
+		</association>  
+	</resultMap>	
+	<select id="getLocalAuthByUsernameAndPwd" resultMap="localAuthResultMap" parameterType="String">
+		SELECT
+		l.local_auth_id,
+		l.username,
+		l.pass_word,
+		l.create_time,
+		l.alter_time,
+		p.user_id,
+		p.user_name,
+		p.user_sex,
+		p.user_email,
+		p.user_img,
+		p.user_mark,
+		p.user_create_time,
+		p.user_alter_time,
+		p.user_status
+		FROM
+		tb_local_auth AS l
+		LEFT JOIN
+		tb_person_info AS p
+		ON
+		l.user_id = p.user_id
+		WHERE l.username = #{userName} AND l.pass_word = #{password};
+	</select>
+	
+	<select id="getLocalAuthByUserId" resultMap="localAuthResultMap" parameterType="long">
+		SELECT
+		l.local_auth_id,
+		l.username,
+		l.pass_word,
+		l.create_time,
+		l.alter_time,
+		p.user_id,
+		p.user_name,
+		p.user_sex,
+		p.user_email,
+		p.user_img,
+		p.user_mark,
+		p.user_create_time,
+		p.user_alter_time,
+		p.user_status
+		FROM
+		tb_local_auth AS l
+		LEFT JOIN
+		tb_person_info AS p
+		ON
+		l.user_id = p.user_id
+		WHERE l.user_id = #{userId};
+	</select>
+	
+	<insert id="insertLocalAuth" parameterType="com.yang.o2o.entity.LocalAuth"
+		useGeneratedKeys="true" keyProperty="localAuthId" keyColumn="local_auth_id">
+		INSERT INTO 
+		tb_local_auth(username,pass_word,user_id,create_time,alter_time)
+		VALUES(#{userName}, #{passWord}, #{personinfo.userId}, #{createTime}, #{alterTime})
+	</insert>
+	
+	<update id="updateLocalAuth">
+		UPDATE tb_local_auth
+		<set>
+			<if test="newPassword != null">pass_word=#{newPassword},</if>
+			<if test="alterTime != null">alter_time=#{alterTime}</if>
+		</set>
+		where user_id=#{userId}
+		AND username=#{userName}
+		AND
+		pass_word=#{password}
+	</update>
+</mapper>
+  

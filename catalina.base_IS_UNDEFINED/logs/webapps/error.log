@@ -1,0 +1,1 @@
+2019-05-29 16:28:26.960 [main] ERROR com.yang.o2o.util.ImageUtil -net.coobird.thumbnailator.tasks.UnsupportedFormatException: No suitable ImageReader found for source data.

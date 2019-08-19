@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yang.o2o.dao.HeadLineDao">
+	<select id="queryHeadLine"  resultType="com.yang.o2o.entity.HeadLine">
+		SELECT 
+		head_line_id,
+		head_line_name,
+		head_line_weight,
+		head_line_status,
+		head_line_link,
+		head_line_img,
+		create_time,
+		alter_time
+		FROM 
+		tb_head_line
+		<where>
+			<if test="headLineCondition.headLineStatus != null">
+				and head_line_status=#{headLineCondition.headLineStatus}
+			</if>
+		</where>
+		ORDER BY head_line_weight DESC;
+	</select>
+</mapper>
