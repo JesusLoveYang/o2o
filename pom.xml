@@ -110,7 +110,7 @@
 	<dependency>
 		<groupId>mysql</groupId>
 		<artifactId>mysql-connector-java</artifactId> <!-- 这个jar包是 jdbc与mysql的交互 -->
-		<version>5.1.47</version>
+		<version>8.0.28</version>
 	</dependency>
 	<!-- https://mvnrepository.com/artifact/redis.clients/jedis  redis缓存客户端jedis-->
 	<dependency>
